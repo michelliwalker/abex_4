@@ -1,0 +1,186 @@
+/* ============================
+   GatePass – CSS consolidado (limpo)
+   ============================ */
+
+/* ---- Paleta / base ---- */
+:root{
+    --brand-navy:#0f172a;
+    --brand-blue:#177e9a;
+    --brand-blue-600:#0f6a86;
+    --brand-orange:#f4a62a;
+    --ink:#0b1220;
+    --bg:#f7f8fb;
+    --card:#ffffff;
+    --line:#e6e9f2;
+    --muted:#64748b;
+
+    --radius:14px;
+    --shadow:0 14px 40px rgba(2,6,23,.06);
+
+    /* normalização */
+    --control-h:48px;
+    --control-br:12px;
+    --control-px:12px;
+
+    font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+}
+
+*{ box-sizing:border-box; }
+html,body,#root{ height:100%; margin:0; background:var(--bg); color:var(--ink); }
+
+/* ---- Layout geral ---- */
+.centered-content{
+    min-height:100vh; display:flex; justify-content:center; align-items:center;
+    padding:28px 16px;
+}
+.page-body{ padding:16px; }
+
+/* ---- Cartão/Container ---- */
+.container{
+    width:100%; max-width:920px; background:var(--card); border:1px solid var(--line);
+    border-radius:var(--radius); box-shadow:var(--shadow); padding:28px; margin:16px auto;
+}
+.login-card{ max-width:460px; }
+.form-card{ max-width:720px; }
+
+/* ---- Marca / topo ---- */
+.logo-wrap{ display:flex; justify-content:center; margin-bottom:10px; }
+.logo-login{ width:160px; height:auto; display:block; }
+
+/* ---- Títulos ---- */
+h1{
+    margin:6px 0 12px; text-align:center; color:var(--brand-navy);
+    font-size:clamp(24px,3.4vw,36px); font-weight:900; letter-spacing:.3px;
+}
+
+/* ---- Abas de navegação ---- */
+.nav-tabs{ display:flex; gap:20px; justify-content:center; margin:2px 0 16px; }
+.nav-tabs a,.nav-tabs .muted{
+    font-weight:700; color:var(--brand-navy); text-decoration:none; position:relative; padding:4px 2px;
+}
+.nav-tabs a:hover{ color:var(--brand-blue); }
+.brand-tabs a:hover::after{
+    content:""; position:absolute; left:0; bottom:-6px; width:100%; height:3px;
+    background:var(--brand-orange); border-radius:3px;
+}
+
+/* ---- Formulário ---- */
+.form-group{ display:flex; flex-direction:column; gap:6px; margin-bottom:12px; }
+.form-group label{ font-weight:700; color:var(--brand-navy); }
+
+/* Inputs: uma única definição completa */
+input:not([type]),
+input[type="text"], input[type="email"], input[type="password"],
+input[type="tel"], input[type="search"], input[type="number"]{
+    width:100%; height:var(--control-h); padding:0 var(--control-px);
+    border-radius:var(--control-br); background:#f9fafb; border:1px solid #d1d5db;
+    line-height:var(--control-h); display:block; box-sizing:border-box;
+    outline:0; transition:border-color .15s, box-shadow .15s, background .15s;
+}
+input:focus{ background:#fff; border-color:var(--brand-blue); box-shadow:0 0 0 4px rgba(23,126,154,.15); }
+input:focus-visible{ outline:2px solid var(--brand-blue); outline-offset:2px; }
+input::placeholder{ line-height:normal; }
+input,button{ -webkit-appearance:none; appearance:none; border-radius:var(--control-br); }
+input:-webkit-autofill{ -webkit-box-shadow:0 0 0 1000px #f9fafb inset !important; }
+
+/* estado de erro opcional */
+.is-invalid{ border-color:#ef4444 !important; box-shadow:0 0 0 3px rgba(239,68,68,.15) !important; }
+
+/* ---- Grid de duas colunas ---- */
+.grid-2{ display:grid; grid-template-columns:repeat(2, minmax(0,1fr)); gap:12px; align-items:stretch; }
+.col-span-2{ grid-column:span 2; }
+@media (max-width:640px){
+    .grid-2{ grid-template-columns:1fr; }
+    .col-span-2{ grid-column:span 1; }
+}
+
+/* ---- Botões ---- */
+.btn{
+    display:inline-flex; align-items:center; justify-content:center; gap:8px;
+    height:var(--control-h); line-height:calc(var(--control-h) - 2px);
+    padding:0 18px; border-radius:var(--control-br); box-sizing:border-box;
+    border:1px solid #e5e7eb; background:#fff; color:var(--brand-blue);
+    font-weight:800; letter-spacing:.2px; cursor:pointer; text-decoration:none;
+    transition:filter .2s, transform .05s, box-shadow .2s, background .2s, color .2s, border-color .2s;
+}
+.btn:hover{ filter:brightness(.97); }
+.btn:active{ transform:translateY(1px); }
+
+.btn-brand{
+    width:100%; background:linear-gradient(135deg, var(--brand-blue), var(--brand-blue-600));
+    color:#fff; border:none; box-shadow:0 6px 18px rgba(15,23,42,.18);
+}
+.btn-brand:hover{ filter:brightness(.96); }
+
+.btn-outline{ color:var(--brand-blue); border-color:var(--brand-blue); background:#fff; }
+
+/* Linha de ações reutilizável */
+.actions-row{ display:flex; gap:8px; }
+a.btn{ display:inline-flex; align-items:center; justify-content:center; }
+
+/* ---- Links menores / alinhamentos ---- */
+.texto-centro{ text-align:center; }
+.link-menor{ margin-top:8px; font-size:14px; }
+.link-menor a{ color:#4c1d95; }
+.link-menor a:hover{ text-decoration:underline; }
+.link-inline{
+    background:none; border:none; padding:0; color:var(--brand-blue); font:inherit; cursor:pointer; text-decoration:underline;
+}
+
+/* ---- Bloco "escolha o tipo de cadastro" ---- */
+.signup-chooser{
+    margin-top:12px; padding:12px; border:1px solid var(--line); background:#f8fafc; border-radius:12px; text-align:center;
+}
+.signup-chooser p{ margin:0 0 8px; color:var(--brand-navy); font-weight:800; }
+.chooser-row{ display:flex; gap:8px; justify-content:center; }
+@media (max-width:480px){ .chooser-row{ flex-direction:column; } }
+
+/* ---- Alerts ---- */
+.alert{ padding:10px 12px; border-radius:10px; margin:8px 0 12px; font-weight:700; }
+.alert.error{ background:#fee2e2; color:#7f1d1d; border:1px solid #fecaca; }
+.alert.success{ background:#dcfce7; color:#14532d; border:1px solid #bbf7d0; }
+
+/* ---- Pequenos toques ---- */
+.muted{ color:var(--muted); font-weight:700; }
+
+/* ====== Produto – Detalhes ====== */
+.produto-detalhe{ display:grid; grid-template-columns:1.1fr 1fr; gap:20px; }
+@media (max-width:880px){ .produto-detalhe{ grid-template-columns:1fr; } }
+.produto-galeria .produto-hero{
+    width:100%; height:420px; object-fit:cover; border-radius:14px; border:1px solid var(--line); background:#f9fafb;
+}
+.produto-galeria .thumbs{ margin-top:10px; display:flex; gap:8px; }
+.produto-galeria .thumbs img{
+    width:84px; height:84px; object-fit:cover; border-radius:10px; border:1px solid var(--line); background:#fff; cursor:pointer;
+}
+.produto-info .badges{ display:flex; gap:8px; margin:6px 0 4px; }
+.badge{
+    display:inline-block; padding:4px 8px; border-radius:999px; font-weight:800;
+    color:var(--brand-navy); background:#eef2ff; border:1px solid #e5e7eb;
+}
+.preco-bloco{ display:flex; align-items:baseline; gap:12px; margin-top:8px; }
+.preco{ font-size:28px; font-weight:900; color:var(--brand-navy); }
+.comprar{ display:flex; align-items:center; gap:10px; margin:16px 0; }
+.comprar input[type="number"]{ width:96px; text-align:center; }
+.box{ border:1px solid var(--line); border-radius:12px; padding:12px; background:#fff; margin:12px 0; }
+.tabela-specs{ width:100%; border-collapse:collapse; }
+.tabela-specs td{ border-bottom:1px solid var(--line); padding:8px; }
+.tabela-specs tr:last-child td{ border-bottom:0; }
+
+/* ====== Vitrine ====== */
+.vitrine-filtros{
+    display:grid; grid-template-columns:1fr auto; gap:12px; align-items:center; margin-bottom:16px;
+}
+@media (max-width:640px){ .vitrine-filtros{ grid-template-columns:1fr; } }
+
+.grid-produtos{
+    display:flex; flex-wrap:wrap; gap:16px; justify-content:center;
+}
+.card-produto{
+    width:min(300px, 100%); border:1px solid var(--line); border-radius:12px; padding:12px; background:#fff;
+}
+.img-produto{
+    width:100%; height:160px; object-fit:cover; border-radius:8px; border:1px solid var(--line); background:#f9fafb;
+}
+.acoes-produto{ display:flex; gap:8px; margin-top:8px; }
+.acoes-produto .btn{ flex:1; }
