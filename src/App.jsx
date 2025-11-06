@@ -4,6 +4,7 @@ import LoginUsuario from "./pages/LoginUsuario.jsx";
 import CadastroCliente from "./pages/CadastroCliente.jsx";
 import CadastroVendedor from "./pages/CadastroVendedor.jsx";
 import VitrinePublica from "./pages/VitrinePublica.jsx";
+import GerenciarAssentos from "./pages/GerenciarAssentos.jsx"; // ✅ caminho corrigido
 
 import "./styles/style.css";
 
@@ -26,6 +27,9 @@ export default function App() {
             <Route path="/login" element={<LoginUsuario />} />
             <Route path="/cadastro-cliente" element={<CadastroCliente />} />
             <Route path="/cadastro-vendedor" element={<CadastroVendedor />} />
+
+            {/* novo: assentos */}
+            <Route path="/assentos" element={<GerenciarAssentos />} /> {/* ✅ rota nova */}
 
             {/* utilidades */}
             <Route path="/home" element={<Navigate to="/" replace />} />
