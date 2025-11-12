@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { listarProdutosPublico } from "../services/produtosApi";
+import { isLoggedIn } from "../services/auth";
 
 export default function VitrinePublica() {
     const [loading, setLoading] = useState(true);
@@ -10,6 +11,10 @@ export default function VitrinePublica() {
     const [q, setQ] = useState("");
     const [categoria, setCategoria] = useState("todas");
     const [ordem, setOrdem] = useState("relevancia");
+
+    const [msg, setMsg] = useState({ tipo: "", texto: "" });
+
+    const navigate = useNavigate();
 
     useEffect(() => {
         let isMounted = true;
@@ -53,6 +58,42 @@ export default function VitrinePublica() {
         return arr;
     }, [produtos, q, categoria, ordem]);
 
+    async function handleComprar(produto) {
+        if (produto.estoque === 0) {
+            setMsg({ tipo: "error", texto: "Este ingresso está indisponível no momento." });
+            return;
+        }
+
+        if (!isLoggedIn()) {
+            navigate("/login");
+            return;
+        }
+
+        try {
+            // se o PHP espera GET, isso aqui funciona
+            const res = await fetch(
+                `/adicionar_carrinho.php?id=${encodeURIComponent(produto.id)}&quantidade=1`
+            );
+
+            if (!res.ok) {
+                throw new Error("HTTP " + res.status);
+            }
+
+            // se seu PHP devolver JSON, você pode ler aqui:
+            // const data = await res.json();
+
+            setMsg({
+                tipo: "success",
+                texto: "Ingresso adicionado ao carrinho com sucesso."
+            });
+        } catch (e) {
+            setMsg({
+                tipo: "error",
+                texto: "Não foi possível adicionar ao carrinho. Tente novamente."
+            });
+        }
+    }
+
     if (loading) {
         return <div className="container"><p className="muted">Carregando vitrine…</p></div>;
     }
@@ -64,10 +105,16 @@ export default function VitrinePublica() {
         <div className="page-body">
             <div className="container">
                 <div className="logo-wrap">
-                    {/* troque /logo.svg se quiser */}
                     <img className="logo-login" src="/gate-pass-logo.png" alt="Logo" />
                 </div>
                 <h1>Ingressos</h1>
+
+                {/* Mensagem global */}
+                {msg.texto && (
+                    <div className={`alert ${msg.tipo === "error" ? "error" : "success"}`}>
+                        {msg.texto}
+                    </div>
+                )}
 
                 {/* Filtros */}
                 <div className="vitrine-filtros">
@@ -131,18 +178,18 @@ export default function VitrinePublica() {
 
                             {/* BOTÕES */}
                             <div className="acoes-produto">
-                                <a
+                                <button
+                                    type="button"
                                     className="btn btn-brand"
-                                    href={p.urlCompra || "/login"}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    aria-disabled={p.estoque === 0 ? "true" : "false"}
-                                    onClick={(e) => { if (p.estoque === 0) e.preventDefault(); }}
+                                    onClick={() => handleComprar(p)}
                                 >
                                     {p.estoque === 0 ? "Indisponível" : "Comprar"}
-                                </a>
+                                </button>
 
-                                <Link className="btn btn-outline" to={`/produto/${encodeURIComponent(p.id)}`}>
+                                <Link
+                                    className="btn btn-outline"
+                                    to={`/produto/${encodeURIComponent(p.id)}`}
+                                >
                                     Ver detalhes
                                 </Link>
                             </div>

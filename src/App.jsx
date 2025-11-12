@@ -6,6 +6,11 @@ import CadastroVendedor from "./pages/CadastroVendedor.jsx";
 import VitrinePublica from "./pages/VitrinePublica.jsx";
 import DetalhesProduto from "./pages/DetalhesProduto.jsx"; // <- IMPORTA
 import DashboardVendedor from "./pages/DashboardVendedor.jsx";
+import CadastrarProduto from "./pages/CadastrarProduto.jsx";
+import EditarProduto from "./pages/EditarProduto.jsx";
+import ExcluirProduto from "./pages/ExcluirProduto.jsx";
+import MeusProdutos from "./pages/MeusProdutos.jsx";
+
 
 import "./styles/style.css";
 
@@ -28,6 +33,10 @@ export default function App() {
             <Route path="/cadastro-cliente" element={<CadastroCliente />} />
             <Route path="/cadastro-vendedor" element={<CadastroVendedor />} />
             <Route path="/dashboard-vendedor" element={<DashboardVendedor />} />
+            <Route path="/cadastrar-produto" element={<CadastrarProduto />} />
+            <Route path="/editar-produto/:id" element={<EditarProduto />} />
+            <Route path="/excluir-produto/:id" element={<ExcluirProduto />} />
+            <Route path="/meus-produtos" element={<MeusProdutos />} />
 
 
             <Route path="/home" element={<Navigate to="/" replace />} />
