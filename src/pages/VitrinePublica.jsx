@@ -1,28 +1,26 @@
 import { useEffect, useMemo, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
 import { listarProdutosPublico } from "../services/produtosApi";
-import { isLoggedIn } from "../services/auth";
 
 export default function VitrinePublica() {
     const [loading, setLoading] = useState(true);
     const [erro, setErro] = useState("");
     const [produtos, setProdutos] = useState([]);
 
+    // filtros UI
     const [q, setQ] = useState("");
     const [categoria, setCategoria] = useState("todas");
     const [ordem, setOrdem] = useState("relevancia");
-
-    const [msg, setMsg] = useState({ tipo: "", texto: "" });
-
-    const navigate = useNavigate();
 
     useEffect(() => {
         let isMounted = true;
         (async () => {
             try {
                 const data = await listarProdutosPublico();
-                if (isMounted) setProdutos(data);
-            } catch {
+                if (isMounted) {
+                    setProdutos(data);
+                    setErro("");
+                }
+            } catch (e) {
                 if (isMounted) setErro("Não foi possível carregar a vitrine agora.");
             } finally {
                 if (isMounted) setLoading(false);
@@ -38,6 +36,7 @@ export default function VitrinePublica() {
 
     const filtrados = useMemo(() => {
         let arr = produtos.slice();
+
         if (q.trim()) {
             const t = q.trim().toLowerCase();
             arr = arr.filter(p =>
@@ -46,57 +45,33 @@ export default function VitrinePublica() {
                 (p.local || "").toLowerCase().includes(t)
             );
         }
+
         if (categoria !== "todas") {
             arr = arr.filter(p => (p.categoria || "Outros") === categoria);
         }
+
         switch (ordem) {
-            case "menor-preco": arr.sort((a,b)=>(a.preco||0)-(b.preco||0)); break;
-            case "maior-preco": arr.sort((a,b)=>(b.preco||0)-(a.preco||0)); break;
-            case "data": arr.sort((a,b)=>new Date(a.dataEvento||0)-new Date(b.dataEvento||0)); break;
-            default: break; // relevância mantém ordem vinda
+            case "menor-preco":
+                arr.sort((a, b) => (a.preco || 0) - (b.preco || 0));
+                break;
+            case "maior-preco":
+                arr.sort((a, b) => (b.preco || 0) - (a.preco || 0));
+                break;
+            case "data":
+                arr.sort((a, b) => new Date(a.dataEvento || 0) - new Date(b.dataEvento || 0));
+                break;
+            default:
+                // relevância: mantém ordem original
+                break;
         }
+
         return arr;
     }, [produtos, q, categoria, ordem]);
-
-    async function handleComprar(produto) {
-        if (produto.estoque === 0) {
-            setMsg({ tipo: "error", texto: "Este ingresso está indisponível no momento." });
-            return;
-        }
-
-        if (!isLoggedIn()) {
-            navigate("/login");
-            return;
-        }
-
-        try {
-            // se o PHP espera GET, isso aqui funciona
-            const res = await fetch(
-                `/adicionar_carrinho.php?id=${encodeURIComponent(produto.id)}&quantidade=1`
-            );
-
-            if (!res.ok) {
-                throw new Error("HTTP " + res.status);
-            }
-
-            // se seu PHP devolver JSON, você pode ler aqui:
-            // const data = await res.json();
-
-            setMsg({
-                tipo: "success",
-                texto: "Ingresso adicionado ao carrinho com sucesso."
-            });
-        } catch (e) {
-            setMsg({
-                tipo: "error",
-                texto: "Não foi possível adicionar ao carrinho. Tente novamente."
-            });
-        }
-    }
 
     if (loading) {
         return <div className="container"><p className="muted">Carregando vitrine…</p></div>;
     }
+
     if (erro) {
         return <div className="container"><div className="alert error">{erro}</div></div>;
     }
@@ -109,13 +84,6 @@ export default function VitrinePublica() {
                 </div>
                 <h1>Ingressos</h1>
 
-                {/* Mensagem global */}
-                {msg.texto && (
-                    <div className={`alert ${msg.tipo === "error" ? "error" : "success"}`}>
-                        {msg.texto}
-                    </div>
-                )}
-
                 {/* Filtros */}
                 <div className="vitrine-filtros">
                     <input
@@ -127,10 +95,8 @@ export default function VitrinePublica() {
 
                     <div className="actions-row" style={{ justifyContent: "flex-end" }}>
                         <select value={categoria} onChange={e => setCategoria(e.target.value)}>
-                            {categorias.map(c => (
-                                <option key={c} value={c}>
-                                    {c === "todas" ? "Todas categorias" : c}
-                                </option>
+                            {categorias.map((c) => (
+                                <option key={c} value={c}>{c === "todas" ? "Todas categorias" : c}</option>
                             ))}
                         </select>
 
@@ -143,22 +109,17 @@ export default function VitrinePublica() {
                     </div>
                 </div>
 
-                {/* Grid */}
+                {/* Grid de produtos */}
                 <div className="grid-produtos">
                     {filtrados.map((p) => (
                         <article key={p.id} className="card-produto">
-                            <Link to={`/produto/${encodeURIComponent(p.id)}`}>
-                                <img
-                                    src={p.imagem || "/placeholder.jpg"}
-                                    alt={p.nome}
-                                    className="img-produto"
-                                    loading="lazy"
-                                />
-                            </Link>
-
-                            <h3 style={{ margin: "10px 0 4px" }}>
-                                <Link to={`/produto/${encodeURIComponent(p.id)}`}>{p.nome}</Link>
-                            </h3>
+                            <img
+                                src={p.imagem || "/placeholder.jpg"}
+                                alt={p.nome}
+                                className="img-produto"
+                                loading="lazy"
+                            />
+                            <h3 style={{ margin: "10px 0 4px" }}>{p.nome}</h3>
 
                             <div className="muted" style={{ fontSize: 14 }}>
                                 {(p.local || "").trim()}
@@ -167,7 +128,11 @@ export default function VitrinePublica() {
 
                             <div className="preco-bloco">
                                 <span className="preco">{formatarPreco(p.preco)}</span>
-                                {p.estoque === 0 && <span className="badge">Esgotado</span>}
+                                {p.estoque === 0 && (
+                                    <span className="badge" title="Sem estoque">
+                    Esgotado
+                  </span>
+                                )}
                             </div>
 
                             {p.descricao && (
@@ -176,29 +141,25 @@ export default function VitrinePublica() {
                                 </p>
                             )}
 
-                            {/* BOTÕES */}
                             <div className="acoes-produto">
-                                <button
-                                    type="button"
+                                <a className="btn btn-outline" href={`/cadastro-cliente`}>Criar conta</a>
+                                <a
                                     className="btn btn-brand"
-                                    onClick={() => handleComprar(p)}
+                                    href={p.urlCompra || "/login"}
+                                    aria-disabled={p.estoque === 0 ? "true" : "false"}
+                                    onClick={(e) => {
+                                        if (p.estoque === 0) e.preventDefault();
+                                    }}
                                 >
                                     {p.estoque === 0 ? "Indisponível" : "Comprar"}
-                                </button>
-
-                                <Link
-                                    className="btn btn-outline"
-                                    to={`/produto/${encodeURIComponent(p.id)}`}
-                                >
-                                    Ver detalhes
-                                </Link>
+                                </a>
                             </div>
                         </article>
                     ))}
 
                     {filtrados.length === 0 && (
                         <div className="muted" style={{ padding: 20 }}>
-                            Sem resultados para sua busca.
+                            Sem resultados para sua busca. Tenta outra palavra.
                         </div>
                     )}
                 </div>
